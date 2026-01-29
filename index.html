@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gép Karbantartás - FX-8320</title>
+    <style>
+        body { font-family: sans-serif; background: #0d0d0d; color: #e0e0e0; display: flex; justify-content: center; padding: 20px; }
+        .container { max-width: 550px; width: 100%; border: 2px solid #333; background: #1a1a1a; padding: 20px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.6); }
+        h2 { color: #00ffcc; text-align: center; border-bottom: 2px solid #00ffcc; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        h3 { color: #ff00ff; font-size: 1.1em; margin-top: 25px; border-left: 4px solid #ff00ff; padding-left: 10px; }
+        .yellow-title { color: #f1c40f; border-left: 4px solid #f1c40f; padding-left: 10px; margin-top: 25px; font-weight: bold; }
+
+        .item { 
+            background: #262626; margin: 10px 0; padding: 14px; border-radius: 8px; 
+            cursor: pointer; border-left: 5px solid #444; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+        }
+        .item.done { border-left-color: #2ecc71; background: #1e2d24; color: #2ecc71; }
+        .status { color: #888; font-family: monospace; }
+        
+        .cmd-container { position: relative; margin-top: 15px; margin-bottom: 10px; }
+        .cmd-box {
+            background: #000; border: 1px solid #555; padding: 15px; 
+            border-radius: 8px; font-family: monospace; font-size: 0.85em;
+            color: #00ffcc; overflow-x: auto; white-space: pre-wrap;
+        }
+        .yellow-border { border: 1px solid #f1c40f; color: #f1c40f; }
+
+        .copy-btn {
+            position: absolute; top: -12px; right: 5px;
+            background: #007bff; color: white; border: none;
+            padding: 5px 12px; border-radius: 4px; cursor: pointer;
+            font-size: 0.75em; font-weight: bold; z-index: 10;
+        }
+
+        .guide { font-size: 0.8em; color: #bbb; margin-bottom: 5px; display: block; font-weight: bold; }
+        .key-hint { background: #333; padding: 2px 5px; border-radius: 4px; color: #fff; border: 1px solid #555; }
+
+        .reset-btn {
+            width: 100%; padding: 15px; margin-top: 25px;
+            background: transparent; border: 2px solid #ff00ff; color: #ff00ff;
+            border-radius: 10px; cursor: pointer; font-weight: bold;
+        }
+        .footer { text-align: center; font-size: 0.75em; color: #555; margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🛠️ KARBANTARTÓ KÖZPONT</h2>
+        
+        <div class="item" onclick="toggle(this)">
+            <span>Böngésző manuális takarítás (Ctrl+Shift+Del)</span>
+            <span class="status">[ ]</span>
+        </div>
+
+        <div class="yellow-title">⌨️ 1. MÁSOLÓS: Win + R (Böngésző Pucoló)</div>
+        <span class="guide">Nyomj <span class="key-hint">Win + R</span>, illeszd be, majd <span class="key-hint">Enter</span>:</span>
+        <div class="cmd-container">
+            <button class="copy-btn" onclick="copyText('winr1', this)">MÁSOLÁS</button>
+            <div class="cmd-box yellow-border" id="winr1">cmd /c "del /q /s /f %LocalAppData%\Google\Chrome\User Data\Default\Cache\*.*"</div>
+        </div>
+
+        <div class="yellow-title">⌨️ 2. MÁSOLÓS: Win + R (Memória Felszabadítás)</div>
+        <span class="guide">Nyomj <span class="key-hint">Win + R</span>, illeszd be, majd <span class="key-hint">Enter</span>:</span>
+        <div class="cmd-container">
+            <button class="copy-btn" onclick="copyText('winr2', this)">MÁSOLÁS</button>
+            <div class="cmd-box yellow-border" id="winr2">cmd /c "del /q /s /f %temp%\*.*"</div>
+        </div>
+
+        <h3>💻 3. MÁSOLÓS: Rendszergazda CMD (Mélypucolás)</h3>
+        <span class="guide">Nyiss egy <span class="key-hint">CMD-t (Admin)</span> és illeszd be:</span>
+        <div class="cmd-container">
+            <button class="copy-btn" onclick="copyText('cmdCode', this)">MÁSOLÁS</button>
+            <div class="cmd-box" id="cmdCode">ipconfig /flushdns & rd /s /q %temp% & mkdir %temp%</div>
+        </div>
+
+        <div class="item" onclick="toggle(this)">
+            <span>RAM (16GB) & FX-8320 Adatok OK</span>
+            <span class="status">[ ]</span>
+        </div>
+
+        <button class="reset-btn" onclick="resetList()">MINDEN ALAPHELYZETBE</button>
+        
+        <div class="footer">AMD FX-8320 | 16GB RAM (1600MHz) | 2026-01-29</div>
+    </div>
+
+    <script>
+        function toggle(el) {
+            el.classList.toggle('done');
+            let status = el.querySelector('.status');
+            status.innerText = el.classList.contains('done') ? '[RENDBEN]' : '[ ]';
+        }
+
+        function copyText(id, btn) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const old = btn.innerText;
+                btn.innerText = "MÁSOLVA!";
+                btn.style.background = "#28a745";
+                setTimeout(() => { btn.innerText = old; btn.style.background = "#007bff"; }, 2000);
+            });
+        }
+
+        function resetList() {
+            document.querySelectorAll('.item').forEach(item => {
+                item.classList.remove('done');
+                item.querySelector('.status').innerText = '[ ]';
+            });
+        }
+    </script>
+</body>
+</html>
