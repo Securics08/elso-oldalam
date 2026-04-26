@@ -24,7 +24,7 @@
         button:hover { filter: brightness(1.3); transform: scale(1.02); }
         
         .btn-save { background: #0055ff; border-color: #00f6ff; box-shadow: 0 0 15px #0055ff66; }
-        .btn-copy { background: #0088ff; border-color: #00ccff; box-shadow: 0 0 10px #0088ff44; flex: 1 !important; } /* Új kék gomb */
+        .btn-copy { background: #0088ff; border-color: #00ccff; box-shadow: 0 0 10px #0088ff44; flex: 1 !important; }
         .btn-del { background: #aa0000; border-color: #ff4444; }
         .btn-run { background: #0f0; color: #000; font-size: 15px; flex: 2; box-shadow: 0 0 20px #0f08; }
         .btn-imp { background: #d47a00; border-color: #ff9d00; }
@@ -100,19 +100,15 @@
         loadList();
     };
 
-    // KÓD MÁSOLÁSA FUNKCIÓ
     function copyCode() {
         const editor = document.getElementById("editor");
         editor.select();
         document.execCommand("copy");
-        
-        // Vizuális visszajelzés a gombon
         const btn = document.querySelector(".btn-copy");
         const originalText = btn.innerText;
         btn.innerText = "MÁSOLVA! ✓";
         btn.style.background = "#00ff88";
         btn.style.color = "#000";
-        
         setTimeout(() => {
             btn.innerText = originalText;
             btn.style.background = "#0088ff";
@@ -138,10 +134,13 @@
         const store = tx.objectStore("projects");
         const data = { name, code, color, time: new Date().toLocaleString() };
         if (activeId) data.id = activeId;
+        
         store.put(data).onsuccess = e => {
             activeId = activeId || e.target.result;
             loadList();
-            downloadFile(JSON.stringify(data, null, 2), name.replace(/\s+/g, '_') + ".json");
+            
+            const finalFileName = "Neon_Repo_(html-Save)_" + name.replace(/\s+/g, '_') + "_mentése.json";
+            downloadFile(JSON.stringify(data, null, 2), finalFileName);
         };
     }
 
@@ -197,10 +196,18 @@
     }
 
     function exportData() {
-        let userFileName = prompt("Export név:", "Neon_Backup");
+        const now = new Date();
+        const timestamp = now.getFullYear() + "-" + 
+                        String(now.getMonth() + 1).padStart(2, '0') + "-" + 
+                        String(now.getDate()).padStart(2, '0') + "_" + 
+                        String(now.getHours()).padStart(2, '0') + "-" + 
+                        String(now.getMinutes()).padStart(2, '0');
+        
+        let userFileName = prompt("Export név:", "Neon_Repo_Export_" + timestamp);
         if (!userFileName) return;
+        
         db.transaction("projects", "readonly").objectStore("projects").getAll().onsuccess = e => {
-            downloadFile(JSON.stringify(e.target.result, null, 2), userFileName + ".json");
+            downloadFile(JSON.stringify(e.target.result, null, 2), userFileName.replace(/\s+/g, '_') + ".json");
         };
     }
 
